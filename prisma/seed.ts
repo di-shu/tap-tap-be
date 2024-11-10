@@ -1,0 +1,203 @@
+import { Currency, ItemTypes, PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  await prisma.store.create({
+    data: {
+      items: {
+        createMany: {
+          data: [
+            {
+              name: 'Wooden Pickaxe',
+              type: ItemTypes.PICKAXE,
+              price: 500,
+              expires_in: 32400,
+              lifetime: 32400,
+              estimated_income: 0.09,
+              income: 0.01,
+              currency: Currency.CRYSTAL,
+              level: 1,
+            },
+            {
+              name: 'Stone Pickaxe',
+              type: ItemTypes.PICKAXE,
+              price: 5,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 6,
+              income: 0.25,
+              currency: Currency.TON,
+              level: 2,
+            },
+            {
+              name: 'Iron Pickaxe',
+              type: ItemTypes.PICKAXE,
+              price: 10,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 12,
+              income: 0.5,
+              currency: Currency.TON,
+              level: 3,
+            },
+            {
+              name: 'Golden Pickaxe',
+              type: ItemTypes.PICKAXE,
+              price: 15,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 18,
+              income: 0.75,
+              currency: Currency.TON,
+              level: 4,
+            },
+            {
+              name: 'Diamond Pickaxe',
+              type: ItemTypes.PICKAXE,
+              price: 20,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 24,
+              income: 1,
+              currency: Currency.TON,
+              level: 5,
+            },
+            {
+              name: 'Wooden Carriage',
+              type: ItemTypes.CARRIAGE,
+              price: 10,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 12,
+              income: 0.5,
+              currency: Currency.TON,
+              level: 1,
+            },
+            {
+              name: 'Iron Carriage',
+              type: ItemTypes.CARRIAGE,
+              price: 20,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 24,
+              income: 1,
+              currency: Currency.TON,
+              level: 2,
+            },
+            {
+              name: 'Diamond Carriage',
+              type: ItemTypes.CARRIAGE,
+              price: 30,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 36,
+              income: 1.5,
+              currency: Currency.TON,
+              level: 3,
+            },
+            {
+              name: 'Leather Helmet',
+              type: ItemTypes.HELMET,
+              price: 600,
+              expires_in: 32400,
+              lifetime: 32400,
+              estimated_income: 0.09,
+              income: 0.01,
+              currency: Currency.CRYSTAL,
+              level: 1,
+            },
+            {
+              name: 'Iron Helmet',
+              type: ItemTypes.HELMET,
+              price: 5,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 6,
+              income: 0.25,
+              currency: Currency.TON,
+              level: 2,
+            },
+            {
+              name: 'Golden Helmet',
+              type: ItemTypes.HELMET,
+              price: 10,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 12,
+              income: 0.5,
+              currency: Currency.TON,
+              level: 3,
+            },
+            {
+              name: 'Diamond Helmet',
+              type: ItemTypes.HELMET,
+              price: 15,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 18,
+              income: 0.75,
+              currency: Currency.TON,
+              level: 4,
+            },
+            {
+              name: 'Netherite Helmet',
+              type: ItemTypes.HELMET,
+              price: 20,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 24,
+              income: 1,
+              currency: Currency.TON,
+              level: 5,
+            },
+            {
+              name: 'Wooden Footwear',
+              type: ItemTypes.FOOTWEAR,
+              price: 10,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 12,
+              income: 0.5,
+              currency: Currency.TON,
+              level: 1,
+            },
+            {
+              name: 'Iron Footwear',
+              type: ItemTypes.FOOTWEAR,
+              price: 15,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 18,
+              income: 0.75,
+              currency: Currency.TON,
+              level: 2,
+            },
+            {
+              name: 'Diamond Footwear',
+              type: ItemTypes.FOOTWEAR,
+              price: 20,
+              expires_in: 86400,
+              lifetime: 86400,
+              estimated_income: 24,
+              income: 1,
+              currency: Currency.TON,
+              level: 3,
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  console.log('Database has been seeded. 🌱');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

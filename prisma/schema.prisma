@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  PLAYER
+  ADMIN
+}
+
+enum Currency {
+  CRYSTAL
+  TON
+}
+
+enum ItemTypes {
+  FOOTWEAR
+  PICKAXE
+  CARRIAGE
+  HELMET
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  last_name String
+  username String
+  user_id String @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  crystals_balance Int @default(0)
+  ton_balance Float @default(0)
+  role Roles @default(PLAYER)
+  last_tap_date DateTime? @default(now())
+  available_taps Int? @default(100)
+  referral_code String? @unique
+  sessions Session[]
+  payments Payment[]
+  inventory Inventory?
+  farming Farming?
+  wallet Wallet?
+}
+
+model Session {
+  session_id Int @id @default(autoincrement())
+  session_token String @unique
+  expires_at DateTime @default(now())
+  created_at DateTime @default(now())
+  user_id String 
+  user User @relation(fields: [user_id], references: [user_id])
+}
+
+model Farming {
+  id Int @id @default(autoincrement())
+  isClaimed Boolean @default(false)
+  total_reward Float @default(0)
+  earnings_rate Float @default(0)
+  session_reward Float @default(0)
+  start_time DateTime? @default(now())
+  end_time DateTime?
+  user_id String @unique
+  user User @relation(fields: [user_id], references: [user_id])
+}
+
+model Store {
+  id Int @id @default(autoincrement())
+  items Item[]
+}
+
+model Inventory {
+  id Int @id @default(autoincrement())
+  user_id String @unique 
+  user User @relation(fields: [user_id], references: [user_id])
+  items Item[]
+}
+
+model Item {
+  id Int @id @default(autoincrement())
+  name String
+  type ItemTypes
+  description String?
+  estimated_income Float
+  income Float
+  expires_in Int
+  lifetime Int?
+  price Int
+  currency Currency @default(TON)
+  level Int
+  inventory_id Int?
+  inventory Inventory? @relation(fields: [inventory_id], references: [id])
+  store_id Int?
+  store Store? @relation(fields: [store_id], references: [id])
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+  user_id String 
+  amount String
+  currency String @default("TON")
+  status String @default("pending") // pending, confirmed, failed
+  transaction_hash String? @unique
+  msg_hash String @unique
+  created_at DateTime @default(now())
+  user User @relation(fields: [user_id], references: [user_id])
+  
+  @@index([transaction_hash])
+}
+
+model Wallet {
+  id Int @id @default(autoincrement())
+  user_id String @unique 
+  user User @relation(fields: [user_id], references: [user_id])
+  deposit_address String
+  mnemonic String[]
+}
