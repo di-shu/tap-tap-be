@@ -1,5 +1,4 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import TonWeb from 'tonweb';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import {
@@ -7,7 +6,8 @@ import {
   mnemonicToWalletKey,
   keyPairFromSecretKey,
 } from '@ton/crypto';
-import { TonClient, WalletContractV4 } from '@ton/ton';
+import { TonClient, WalletContractV4, Address } from '@ton/ton';
+import axios from 'axios';
 
 @Injectable()
 export class WalletsService {
@@ -56,4 +56,38 @@ export class WalletsService {
     });
     return wallet.deposit_address;
   }
+
+  async getTransactionStatus(user_id: string) {
+    const walletData = await this.prismaService.wallet.findUnique({
+      where: { user_id },
+    });
+    if (walletData) {
+      const address = Address.parse(walletData.deposit_address);
+      const response = await axios.get(
+        `${process.env.TON_API_URL}/transactions`,
+        {
+          params: {
+            account: address.toString(),
+            limit: 1, // Retrieve the latest transaction
+          },
+        },
+      );
+      const last_transaction = response.data.transactions[0];
+
+      if (
+        last_transaction &&
+        !last_transaction.description.aborted &&
+        last_transaction.description.action.success
+      ) {
+        return { amount: last_transaction.in_msg.value, success: true };
+      }
+    }
+    return { success: false };
+  }
 }
+
+// async verifyTransaction(user_id: string) {
+//   const payment = await this.prismaService.payment.findUnique({
+//     where: { msg_hash },
+//   });
+// }

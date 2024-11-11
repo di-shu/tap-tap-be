@@ -11,14 +11,17 @@ import {
   Query,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
 import { AuthGuard, IGetUserAuthInfoRequest } from 'src/guards/auth.guard';
 import { Response } from 'express';
 import { fromNano } from '@ton/core';
+import { WalletsService } from 'src/wallets/wallets.service';
 
 @Controller('payments')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    private readonly paymentService: PaymentService,
+    private walletsService: WalletsService,
+  ) {}
 
   @Post('transaction/create')
   @UseGuards(AuthGuard)
@@ -37,8 +40,6 @@ export class PaymentController {
     } catch {
       res.status(500).json({ error: 'Error when creating the payment' });
     }
-    // const decoded = await this.paymentService.decodeBoc(boc);
-    // return decoded;
     res.status(200);
   }
   @Post('transaction/check')
@@ -67,7 +68,6 @@ export class PaymentController {
     @Query('status') status: string,
   ) {
     try {
-      console.log(status);
       const transactions = await this.paymentService.getTransactions(
         req.user.userId,
         status,

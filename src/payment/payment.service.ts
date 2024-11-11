@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { ITransactionPayload, ITransactionResponse } from 'src/types/Payment';
+import { ITransactionResponse } from 'src/types/Payment';
 // import { Cell } from '@ton/ton';
 import { Cell, fromNano } from '@ton/core';
 import axios, { AxiosResponse } from 'axios';
@@ -93,14 +92,15 @@ export class PaymentService {
       const payment = await this.prismaService.payment.findUnique({
         where: { msg_hash },
       });
-      console.log(payment);
       if (payment && payment.status === 'pending') {
         const transaction = await this.getTransaction(msg_hash);
-        console.log('tx: ', transaction);
         if (
           transaction &&
           transaction.hash &&
-          transaction.description.compute_ph.success
+          transaction.description.compute_ph.exit_code == 0 &&
+          !transaction.description.aborted &&
+          transaction.description.action.success &&
+          transaction.out_msgs.length > 0
         ) {
           const depositAmount = fromNano(transaction.out_msgs[0].value);
           await this.prismaService.payment.update({
@@ -120,7 +120,6 @@ export class PaymentService {
               },
             },
           });
-          console.log(`Payment ${transaction.hash} completed successfully.`);
           return { success: true, amount: depositAmount };
         }
       }
@@ -148,12 +147,4 @@ export class PaymentService {
       where: { user_id, status: filter },
     });
   }
-
-  // async getTransactionDetails(boc: string) {
-  //   const message_hash = this.getMessageHash(boc);
-
-  //   if (message_hash) {
-  //     console.log(last_transaction);
-  //   }
-  // }
 }

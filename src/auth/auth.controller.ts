@@ -7,7 +7,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 import { UserService } from 'src/user/user.service';
 import * as referralCodes from 'referral-codes';
-import { log } from 'console';
 import { User } from '@prisma/client';
 
 @Controller('auth')
@@ -68,6 +67,9 @@ export class AuthController {
 
           const expiresAt = new Date(Date.now() + 3600 * 1000);
 
+          await this.prismaService.session.deleteMany({
+            where: { user_id: userIdAsString },
+          });
           await this.prismaService.session.create({
             data: {
               user_id: userIdAsString,

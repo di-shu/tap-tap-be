@@ -8,7 +8,12 @@ export interface ITransactionPayload {
 export interface ITransactionResponse {
   hash: string;
   description: {
+    aborted: boolean;
     compute_ph: {
+      success: boolean;
+      exit_code: number;
+    };
+    action: {
       success: boolean;
     };
   };
